@@ -226,6 +226,7 @@ namespace Bend.Util {
             Console.WriteLine("POST request: {0}", p.http_url);
             string data = inputData.ReadToEnd();
 
+            p.writeSuccess();
             p.outputStream.WriteLine("<html><body><h1>test server</h1>");
             p.outputStream.WriteLine("<a href=/test>return</a><p>");
             p.outputStream.WriteLine("postbody: <pre>{0}</pre>", data);
