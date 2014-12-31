@@ -156,16 +156,24 @@ namespace Bend.Util {
         }
 
         public void writeSuccess(string content_type="text/html") {
-            outputStream.WriteLine("HTTP/1.0 200 OK");            
+            // this is the successful HTTP response line
+            outputStream.WriteLine("HTTP/1.0 200 OK");  
+            // these are the HTTP headers...          
             outputStream.WriteLine("Content-Type: " + content_type);
             outputStream.WriteLine("Connection: close");
-            outputStream.WriteLine("");
+            // ..add your own headers here if you like
+
+            outputStream.WriteLine(""); // this terminates the HTTP headers.. everything after this is HTTP body..
         }
 
         public void writeFailure() {
+            // this is an http 404 failure response
             outputStream.WriteLine("HTTP/1.0 404 File not found");
+            // these are the HTTP headers
             outputStream.WriteLine("Connection: close");
-            outputStream.WriteLine("");
+            // ..add your own headers here
+
+            outputStream.WriteLine(""); // this terminates the HTTP headers.
         }
     }
 
