@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 // offered to the public domain for any use with no restriction
@@ -219,9 +220,10 @@ namespace Minimalistic {
 				Stream fs = File.Open("Fiddle.html",FileMode.Open);
 
 				p.WriteSuccess();
-				fs.CopyTo (p.OutputStream.BaseStream);
-				//p.OutputStream.BaseStream.Flush ();
-				p.OutputStream.Flush();
+				//fs.CopyTo (p.OutputStream.BaseStream);
+				//p.OutputStream.BaseStream.Flush();
+				var text = (new StreamReader(fs, Encoding.UTF8)).ReadToEnd();
+				p.OutputStream.Write(text);
 				return;
 			}
 
