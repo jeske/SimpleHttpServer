@@ -249,7 +249,7 @@ namespace Bend.Util {
             if (args.GetLength(0) > 0) {
                 httpServer = new MyHttpServer(Convert.ToInt16(args[0]));
             } else {
-                httpServer = new MyHttpServer(8080);
+                httpServer = new MyHttpServer(1717);
             }
             Thread thread = new Thread(new ThreadStart(httpServer.listen));
             thread.Start();
