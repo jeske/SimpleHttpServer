@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using System.Net;
@@ -216,6 +216,7 @@ namespace Bend.Util {
 				p.writeSuccess("image/png");
 				fs.CopyTo (p.outputStream.BaseStream);
 				p.outputStream.BaseStream.Flush ();
+				fs.Close();
 			}
 
             Console.WriteLine("request: {0}", p.http_url);
