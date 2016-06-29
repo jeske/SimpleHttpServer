@@ -1,5 +1,0 @@
-c:\users\barend.erasmus\documents\visual studio 2015\Projects\SimpleHttpServer\SimpleHttpServer\bin\Debug\SimpleHttpServer.exe
-c:\users\barend.erasmus\documents\visual studio 2015\Projects\SimpleHttpServer\SimpleHttpServer\bin\Debug\SimpleHttpServer.pdb
-c:\users\barend.erasmus\documents\visual studio 2015\Projects\SimpleHttpServer\SimpleHttpServer\obj\x86\Debug\SimpleHttpServer.csprojResolveAssemblyReference.cache
-c:\users\barend.erasmus\documents\visual studio 2015\Projects\SimpleHttpServer\SimpleHttpServer\obj\x86\Debug\SimpleHttpServer.exe
-c:\users\barend.erasmus\documents\visual studio 2015\Projects\SimpleHttpServer\SimpleHttpServer\obj\x86\Debug\SimpleHttpServer.pdb
