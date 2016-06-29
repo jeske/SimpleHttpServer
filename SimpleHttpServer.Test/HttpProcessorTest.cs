@@ -12,7 +12,7 @@ namespace SimpleHttpServer.Test
     public class HttpProcessorTest
     {
         [TestMethod]
-        public void Handle_GivenGETRequest_ReturnsOkResponse()
+        public void HandleClient_GivenGETRequest_Returns200Response()
         {
             MockHttpProcessor httpProcessor = new MockHttpProcessor(new HttpRequest()
             {
@@ -20,7 +20,7 @@ namespace SimpleHttpServer.Test
                 Url = "/Test/Example"
             }, new Route()
             {
-                Url = "/Test/Example",
+                Url = "^/Test/Example$",
                 Method = "GET",
                 Callable = (HttpRequest request) =>
                 {
@@ -33,8 +33,165 @@ namespace SimpleHttpServer.Test
                 }
             });
 
-            httpProcessor.Handle(null);
+            httpProcessor.HandleClient(null);
+            Assert.AreEqual("200", httpProcessor.Response.StatusCode);
+        }
 
+        [TestMethod]
+        public void HandleClient_GivenGETRequestThrowsException_Returns500Response()
+        {
+            MockHttpProcessor httpProcessor = new MockHttpProcessor(new HttpRequest()
+            {
+                Method = "GET",
+                Url = "/Test/Example"
+            }, new Route()
+            {
+                Url = "^/Test/Example$",
+                Method = "GET",
+                Callable = (HttpRequest request) =>
+                {
+                    throw new Exception();
+                }
+            });
+
+            httpProcessor.HandleClient(null);
+            Assert.AreEqual("500", httpProcessor.Response.StatusCode);
+        }
+
+        [TestMethod]
+        public void HandleClient_GivenGETRequestWhereNotRouted_Returns404Response()
+        {
+            MockHttpProcessor httpProcessor = new MockHttpProcessor(new HttpRequest()
+            {
+                Method = "GET",
+                Url = "/Test/Example/NotFound"
+            }, new Route()
+            {
+                Url = "^/Test/Example$",
+                Method = "GET",
+                Callable = (HttpRequest request) =>
+                {
+                    return new HttpResponse()
+                    {
+                        Content = "Hello World",
+                        ReasonPhrase = "OK",
+                        StatusCode = "200"
+                    };
+                }
+            });
+
+            httpProcessor.HandleClient(null);
+            Assert.AreEqual("404", httpProcessor.Response.StatusCode);
+        }
+
+        [TestMethod]
+        public void HandleClient_GivenGETRequestWithQueryString_Returns200Response()
+        {
+            MockHttpProcessor httpProcessor = new MockHttpProcessor(new HttpRequest()
+            {
+                Method = "GET",
+                Url = "/Test/Example?id=10"
+            }, new Route()
+            {
+                Url = "^\\/Test\\/Example\\?id=(\\d+)$",
+                Method = "GET",
+                Callable = (HttpRequest request) =>
+                {
+                    return new HttpResponse()
+                    {
+                        Content = "Hello World",
+                        ReasonPhrase = "OK",
+                        StatusCode = "200"
+                    };
+                }
+            });
+
+            httpProcessor.HandleClient(null);
+
+
+            Assert.AreEqual("200", httpProcessor.Response.StatusCode);
+        }
+
+        [TestMethod]
+        public void Handle_GivenPOSTRequestWhereNotRoutedReturns404Response()
+        {
+            MockHttpProcessor httpProcessor = new MockHttpProcessor(new HttpRequest()
+            {
+                Method = "POST",
+                Url = "/Test/NotFound"
+            }, new Route()
+            {
+                Url = "^/Test/Example$",
+                Method = "GET",
+                Callable = (HttpRequest request) =>
+                {
+                    return new HttpResponse()
+                    {
+                        Content = "Hello World",
+                        ReasonPhrase = "OK",
+                        StatusCode = "200"
+                    };
+                }
+            });
+
+            httpProcessor.HandleClient(null);
+
+            Assert.AreEqual("404", httpProcessor.Response.StatusCode);
+        }
+
+        [TestMethod]
+        public void Handle_GivenPOSTRequestWhereNotRoutedButGETIsRouted_Returns405Response()
+        {
+            MockHttpProcessor httpProcessor = new MockHttpProcessor(new HttpRequest()
+            {
+                Method = "POST",
+                Url = "/Test/Example"
+            }, new Route()
+            {
+                Url = "^/Test/Example$",
+                Method = "GET",
+                Callable = (HttpRequest request) =>
+                {
+                    return new HttpResponse()
+                    {
+                        Content = "Hello World",
+                        ReasonPhrase = "OK",
+                        StatusCode = "200"
+                    };
+                }
+            });
+
+            httpProcessor.HandleClient(null);
+
+            Assert.AreEqual("405", httpProcessor.Response.StatusCode);
+        }
+
+        [TestMethod]
+        public void Handle_GivenPOSTRequest_Returns200Response()
+        {
+            MockHttpProcessor httpProcessor = new MockHttpProcessor(new HttpRequest()
+            {
+                Method = "POST",
+                Url = "/Test/Example",
+                Content = "Hello World"
+            }, new Route()
+            {
+                Url = "^/Test/Example$",
+                Method = "POST",
+                Callable = (HttpRequest request) =>
+                {
+                    Assert.AreEqual("Hello World", request.Content);
+
+                    return new HttpResponse()
+                    {
+                        Content = "Hello World",
+                        ReasonPhrase = "OK",
+                        StatusCode = "200"
+                    };
+                }
+            });
+
+            httpProcessor.HandleClient(null);
 
             Assert.AreEqual("200", httpProcessor.Response.StatusCode);
         }

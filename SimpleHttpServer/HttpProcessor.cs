@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace SimpleHttpServer
@@ -29,7 +30,7 @@ namespace SimpleHttpServer
         #endregion
 
         #region Public Methods
-        public void Handle(TcpClient tcpClient)
+        public void HandleClient(TcpClient tcpClient)
         {
             try
             {
@@ -37,7 +38,7 @@ namespace SimpleHttpServer
                 Stream outputStream = GetOutputStream(tcpClient);
                 HttpRequest request = GetRequest(inputStream, outputStream);
 
-                HttpResponse response = HandleRequest(inputStream, outputStream, request);
+                HttpResponse response = RouteRequest(inputStream, outputStream, request);
 
                 Write(outputStream, response.ToString());
                
@@ -49,9 +50,9 @@ namespace SimpleHttpServer
                 inputStream.Close();
                 inputStream = null;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("Exception: " + e.ToString());
+                throw ex;
 
             }
 
@@ -81,12 +82,6 @@ namespace SimpleHttpServer
             return data;
         }
 
-        private void WriteLine(Stream stream, string text)
-        {
-            byte[] bytes = Encoding.ASCII.GetBytes(text + "\r\n");
-            stream.Write(bytes, 0, bytes.Length);
-        }
-
         private void Write(Stream stream, string text)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(text);
@@ -103,19 +98,38 @@ namespace SimpleHttpServer
             return tcpClient.GetStream();
         }
 
-        protected virtual HttpResponse HandleRequest(Stream inputStream, Stream outputStream, HttpRequest request)
+        protected virtual HttpResponse RouteRequest(Stream inputStream, Stream outputStream, HttpRequest request)
         {
 
-            Route route = this.Routes.SingleOrDefault(x => x.Url == request.Url);
+            List<Route> routes = this.Routes.Where(x => Regex.Match(request.Url, x.Url).Success).ToList();
 
-            if (route == null)
+            if (!routes.Any())
                 return new HttpResponse()
                 {
                     ReasonPhrase = "Not Found",
                     StatusCode = "404"
                 };
 
-            return route.Callable(request);
+            Route route = routes.SingleOrDefault(x => x.Method == request.Method);
+
+            if (route == null)
+                return new HttpResponse()
+                {
+                    ReasonPhrase = "Method Not Allowed",
+                    StatusCode = "405"
+                };
+            try
+            {
+                return route.Callable(request);
+            }
+            catch(Exception ex)
+            {
+                return new HttpResponse()
+                {
+                    ReasonPhrase = "Internal Server Error",
+                    StatusCode = "500"
+                };
+            }
 
         }
 
@@ -156,8 +170,26 @@ namespace SimpleHttpServer
                 }
 
                 string value = line.Substring(pos, line.Length - pos);
-                Console.WriteLine("header: {0}:{1}", name, value);
                 headers.Add(name, value);
+            }
+
+            string content = null;
+            if (headers.ContainsKey("Content-Length"))
+            {
+                int totalBytes = Convert.ToInt32(headers["Content-Length"]);
+                int bytesLeft = totalBytes;
+                byte[] bytes = new byte[totalBytes];
+               
+                while(bytesLeft > 0)
+                {
+                    byte[] buffer = new byte[bytesLeft > 1024? 1024 : bytesLeft];
+                    int n = inputStream.Read(buffer, 0, buffer.Length);
+                    buffer.CopyTo(bytes, totalBytes - bytesLeft);
+
+                    bytesLeft -= n;
+                }
+
+                content = Encoding.ASCII.GetString(bytes);
             }
 
 
@@ -165,7 +197,8 @@ namespace SimpleHttpServer
             {
                 Method = method,
                 Url = url,
-                Headers = headers
+                Headers = headers,
+                Content = content
             };
         }
 

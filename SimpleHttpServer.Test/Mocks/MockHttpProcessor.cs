@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using SimpleHttpServer.Models;
+using SimpleHttpServer;
 
 namespace SimpleHttpServer.Test.Mocks
 {
@@ -42,9 +43,9 @@ namespace SimpleHttpServer.Test.Mocks
             return new MemoryStream();
         }
 
-        protected override HttpResponse HandleRequest(Stream inputStream, Stream outputStream, HttpRequest request)
+        protected override HttpResponse RouteRequest(Stream inputStream, Stream outputStream, HttpRequest request)
         {
-            this.Response = base.HandleRequest(inputStream, outputStream, request);
+            this.Response = base.RouteRequest(inputStream, outputStream, request);
 
             return this.Response;
 

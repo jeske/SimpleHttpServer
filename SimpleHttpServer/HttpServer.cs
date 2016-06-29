@@ -2,6 +2,7 @@
 using SimpleHttpServer.Models;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -13,43 +14,32 @@ namespace SimpleHttpServer
     public class HttpServer
     {
 
-        protected int port;
-        TcpListener listener;
-        bool is_active = true;
+        private int Port;
+        private TcpListener Listener;
+        private HttpProcessor Processor;
+        private bool IsActive = true;
 
-        public HttpServer(int port)
+        public HttpServer(int port, List<Route> routes)
         {
-            this.port = port;
+            this.Port = port;
+            this.Processor = new HttpProcessor();
+
+            foreach(var route in routes)
+            {
+                this.Processor.AddRoute(route);
+            }
         }
 
-        public void listen()
+        public void Listen()
         {
-            HttpProcessor p = new HttpProcessor();
-            p.AddRoute(new Route()
+            this.Listener = new TcpListener(IPAddress.Any, this.Port);
+            this.Listener.Start();
+            while (this.IsActive)
             {
-                Callable = (HttpRequest request) =>
-                {
-                    return new HttpResponse()
-                    {
-                        Content = "hello world",
-                        ReasonPhrase = "OK",
-                        StatusCode = "200"
-                    };
-                },
-                Method = "GET",
-                Url = "/"
-            });
-
-            listener = new TcpListener(port);
-            listener.Start();
-            while (is_active)
-            {
-                TcpClient s = listener.AcceptTcpClient();
+                TcpClient s = this.Listener.AcceptTcpClient();
                 Thread thread = new Thread(() =>
                 {
-                   
-                    p.Handle(s);
-
+                    this.Processor.HandleClient(s);
                 });
                 thread.Start();
                 Thread.Sleep(1);
@@ -57,28 +47,6 @@ namespace SimpleHttpServer
         }
 
     }
-
-
-    public class TestMain
-    {
-        public static int Main(String[] args)
-        {
-            HttpServer httpServer;
-            if (args.GetLength(0) > 0)
-            {
-                httpServer = new HttpServer(Convert.ToInt16(args[0]));
-            }
-            else
-            {
-                httpServer = new HttpServer(8080);
-            }
-            Thread thread = new Thread(new ThreadStart(httpServer.listen));
-            thread.Start();
-            return 0;
-        }
-
-    }
-
 }
 
 
