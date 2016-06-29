@@ -1,0 +1,18 @@
+C:\Development\GitHub\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.Test.dll
+C:\Development\GitHub\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.Test.pdb
+C:\Development\GitHub\SimpleHttpServer.Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Development\GitHub\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.exe
+C:\Development\GitHub\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.pdb
+C:\Development\GitHub\SimpleHttpServer.Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Development\GitHub\SimpleHttpServer.Test\obj\Debug\SimpleHttpServer.Test.csprojResolveAssemblyReference.cache
+C:\Development\GitHub\SimpleHttpServer.Test\obj\Debug\SimpleHttpServer.Test.dll
+C:\Development\GitHub\SimpleHttpServer.Test\obj\Debug\SimpleHttpServer.Test.pdb
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.Test.dll
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.Test.pdb
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.exe
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\bin\Debug\SimpleHttpServer.pdb
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\obj\Debug\SimpleHttpServer.Test.csprojResolveAssemblyReference.cache
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\obj\Debug\SimpleHttpServer.Test.dll
+C:\Users\Barend.Erasmus\Documents\Visual Studio 2015\Projects\SimpleHttpServer\SimpleHttpServer.Test\obj\Debug\SimpleHttpServer.Test.pdb
