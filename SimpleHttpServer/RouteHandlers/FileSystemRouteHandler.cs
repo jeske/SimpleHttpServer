@@ -12,8 +12,26 @@ namespace SimpleHttpServer.RouteHandlers
 {
     public class FileSystemRouteHandler
     {
+        #region Fields
+
+        private bool ShowDirectories = false;
+
+        #endregion
+
+        #region Properties
+
         public string BasePath { get; set; }
-        public bool ShowDirectories { get; set; }
+
+        #endregion
+
+        #region Constructors
+
+        public FileSystemRouteHandler(bool showDirectories)
+        {
+            this.ShowDirectories = showDirectories;
+        }
+
+        #endregion
 
         public HttpResponse Handle(HttpRequest request) {
             var url_part = request.Path;

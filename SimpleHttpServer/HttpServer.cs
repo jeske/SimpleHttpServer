@@ -1,5 +1,6 @@
 ﻿// Copyright (C) 2016 by David Jeske, Barend Erasmus and donated to the public domain
 
+using log4net;
 using SimpleHttpServer;
 using SimpleHttpServer.Models;
 using System;
@@ -15,18 +16,24 @@ namespace SimpleHttpServer
 
     public class HttpServer
     {
+        #region Fields
 
         private int Port;
         private TcpListener Listener;
         private HttpProcessor Processor;
         private bool IsActive = true;
 
+        #endregion
+
+        private static readonly ILog log = LogManager.GetLogger(typeof(HttpServer));
+
+        #region Public Methods
         public HttpServer(int port, List<Route> routes)
         {
             this.Port = port;
             this.Processor = new HttpProcessor();
 
-            foreach(var route in routes)
+            foreach (var route in routes)
             {
                 this.Processor.AddRoute(route);
             }
@@ -47,6 +54,8 @@ namespace SimpleHttpServer
                 Thread.Sleep(1);
             }
         }
+
+        #endregion
 
     }
 }
