@@ -1,4 +1,6 @@
-﻿using SimpleHttpServer;
+﻿// Copyright (C) 2016 by David Jeske, Barend Erasmus and donated to the public domain
+
+using SimpleHttpServer;
 using SimpleHttpServer.Models;
 using System;
 using System.Collections;

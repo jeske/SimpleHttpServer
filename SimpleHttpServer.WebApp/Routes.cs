@@ -1,4 +1,6 @@
-﻿using SimpleHttpServer.Models;
+﻿// Copyright (C) 2016 by Barend Erasmus and donated to the public domain
+
+using SimpleHttpServer.Models;
 using SimpleHttpServer.RouteHandlers;
 using System;
 using System.Collections.Generic;
@@ -20,13 +22,13 @@ namespace SimpleHttpServer.WebApp
                     new Route()
                     {
                         Callable = HomeIndex,
-                        Url = "^\\/$",
+                        UrlRegex = "^\\/$",
                         Method = "GET"
                     },
                     new Route()
                     {
                         Callable = new FileSystemRouteHandler() { BasePath = @"C:\Users\Barend.Erasmus\Desktop\Test"}.Handle,
-                        Url = "^\\/Static\\/(.*)$",
+                        UrlRegex = "^\\/Static\\/(.*)$",
                         Method = "GET"
                     }
                 };
@@ -38,7 +40,7 @@ namespace SimpleHttpServer.WebApp
         {
             return new HttpResponse()
             {
-                Content = "Hello",
+                ContentAsUTF8 = "Hello",
                 ReasonPhrase = "OK",
                 StatusCode = "200"
             };

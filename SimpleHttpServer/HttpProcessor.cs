@@ -1,4 +1,6 @@
-﻿using SimpleHttpServer.Models;
+﻿// Copyright (C) 2016 by David Jeske, Barend Erasmus and donated to the public domain
+
+using SimpleHttpServer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,16 +34,22 @@ namespace SimpleHttpServer
         #region Public Methods
         public void HandleClient(TcpClient tcpClient)
         {
-            try
-            {
                 Stream inputStream = GetInputStream(tcpClient);
                 Stream outputStream = GetOutputStream(tcpClient);
                 HttpRequest request = GetRequest(inputStream, outputStream);
 
-                HttpResponse response = RouteRequest(inputStream, outputStream, request);
+                // route and handle the request...
+                HttpResponse response = RouteRequest(inputStream, outputStream, request);      
+          
+                Console.WriteLine("{0} {1}",response.StatusCode,request.Url);
+                // build a default response for errors
+                if (response.Content == null) {
+                    if (response.StatusCode != "200") {
+                        response.ContentAsUTF8 = string.Format("{0} {1} <p> {2}", response.StatusCode, request.Url, response.ReasonPhrase);
+                    }
+                }
 
-                Write(outputStream, response.ToString());
-               
+                WriteResponse(outputStream, response);
 
                 outputStream.Flush();
                 outputStream.Close();
@@ -49,13 +57,27 @@ namespace SimpleHttpServer
 
                 inputStream.Close();
                 inputStream = null;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
 
+        }
+
+        // this formats the HTTP response...
+        private static void WriteResponse(Stream stream, HttpResponse response) {            
+            if (response.Content == null) {           
+                response.Content = new byte[]{};
+            }
+            
+            // default to text/html content type
+            if (!response.Headers.ContainsKey("Content-Type")) {
+                response.Headers["Content-Type"] = "text/html";
             }
 
+            response.Headers["Content-Length"] = response.Content.Length.ToString();
+
+            Write(stream, string.Format("HTTP/1.0 {0} {1}\r\n",response.StatusCode,response.ReasonPhrase));
+            Write(stream, string.Join("\r\n", response.Headers.Select(x => string.Format("{0}: {1}", x.Key, x.Value))));
+            Write(stream, "\r\n\r\n");
+
+            stream.Write(response.Content, 0, response.Content.Length);       
         }
 
         public void AddRoute(Route route)
@@ -67,7 +89,7 @@ namespace SimpleHttpServer
 
         #region Private Methods
 
-        private string Readline(Stream stream)
+        private static string Readline(Stream stream)
         {
             int next_char;
             string data = "";
@@ -82,9 +104,9 @@ namespace SimpleHttpServer
             return data;
         }
 
-        private void Write(Stream stream, string text)
+        private static void Write(Stream stream, string text)
         {
-            byte[] bytes = Encoding.ASCII.GetBytes(text);
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
             stream.Write(bytes, 0, bytes.Length);
         }
 
@@ -101,13 +123,13 @@ namespace SimpleHttpServer
         protected virtual HttpResponse RouteRequest(Stream inputStream, Stream outputStream, HttpRequest request)
         {
 
-            List<Route> routes = this.Routes.Where(x => Regex.Match(request.Url, x.Url).Success).ToList();
+            List<Route> routes = this.Routes.Where(x => Regex.Match(request.Url, x.UrlRegex).Success).ToList();
 
             if (!routes.Any())
                 return new HttpResponse()
                 {
-                    ReasonPhrase = "Not Found",
-                    StatusCode = "404"
+                    ReasonPhrase = "Not Found (no handler)",
+                    StatusCode = "404",
                 };
 
             Route route = routes.SingleOrDefault(x => x.Method == request.Method);
@@ -116,18 +138,29 @@ namespace SimpleHttpServer
                 return new HttpResponse()
                 {
                     ReasonPhrase = "Method Not Allowed",
-                    StatusCode = "405"
+                    StatusCode = "405",
+
                 };
-            try
-            {
-                return route.Callable(request);
+
+            // extract the path if there is one
+            var match = Regex.Match(request.Url,route.UrlRegex);
+            if (match.Groups.Count > 1) {
+                request.Path = match.Groups[1].Value;
+            } else {
+                request.Path = request.Url;
             }
-            catch(Exception ex)
-            {
+
+            // trigger the route handler...
+            request.Route = route;
+            try {
+                return route.Callable(request);
+            } catch(Exception ex) {
+                Console.WriteLine("Route Handler Exception ({0}): {1}",route.Name,ex.ToString());
+
                 return new HttpResponse()
                 {
-                    ReasonPhrase = "Internal Server Error",
-                    StatusCode = "500"
+                    ReasonPhrase = string.Format("Internal Server Error ({0})", route.Name),
+                    StatusCode = "500",
                 };
             }
 
