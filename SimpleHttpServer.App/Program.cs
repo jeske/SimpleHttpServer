@@ -17,6 +17,7 @@ namespace SimpleHttpServer.App
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure();
 
             var route_config = new List<Models.Route>() {
                 new Route {

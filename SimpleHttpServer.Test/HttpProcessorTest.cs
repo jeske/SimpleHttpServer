@@ -20,13 +20,13 @@ namespace SimpleHttpServer.Test
                 Url = "/Test/Example"
             }, new Route()
             {
-                Url = "^/Test/Example$",
+                UrlRegex = "^/Test/Example$",
                 Method = "GET",
                 Callable = (HttpRequest request) =>
                 {
                     return new HttpResponse()
                     {
-                        Content = "Hello World",
+                        ContentAsUTF8 = "Hello World",
                         ReasonPhrase = "OK",
                         StatusCode = "200"
                     };
@@ -46,7 +46,7 @@ namespace SimpleHttpServer.Test
                 Url = "/Test/Example"
             }, new Route()
             {
-                Url = "^/Test/Example$",
+                UrlRegex = "^/Test/Example$",
                 Method = "GET",
                 Callable = (HttpRequest request) =>
                 {
@@ -67,13 +67,13 @@ namespace SimpleHttpServer.Test
                 Url = "/Test/Example/NotFound"
             }, new Route()
             {
-                Url = "^/Test/Example$",
+                UrlRegex = "^/Test/Example$",
                 Method = "GET",
                 Callable = (HttpRequest request) =>
                 {
                     return new HttpResponse()
                     {
-                        Content = "Hello World",
+                        ContentAsUTF8 = "Hello World",
                         ReasonPhrase = "OK",
                         StatusCode = "200"
                     };
@@ -93,13 +93,13 @@ namespace SimpleHttpServer.Test
                 Url = "/Test/Example?id=10"
             }, new Route()
             {
-                Url = "^\\/Test\\/Example\\?id=(\\d+)$",
+                UrlRegex = "^\\/Test\\/Example\\?id=(\\d+)$",
                 Method = "GET",
                 Callable = (HttpRequest request) =>
                 {
                     return new HttpResponse()
                     {
-                        Content = "Hello World",
+                        ContentAsUTF8 = "Hello World",
                         ReasonPhrase = "OK",
                         StatusCode = "200"
                     };
@@ -121,13 +121,13 @@ namespace SimpleHttpServer.Test
                 Url = "/Test/NotFound"
             }, new Route()
             {
-                Url = "^/Test/Example$",
+                UrlRegex = "^/Test/Example$",
                 Method = "GET",
                 Callable = (HttpRequest request) =>
                 {
                     return new HttpResponse()
                     {
-                        Content = "Hello World",
+                        ContentAsUTF8 = "Hello World",
                         ReasonPhrase = "OK",
                         StatusCode = "200"
                     };
@@ -148,13 +148,13 @@ namespace SimpleHttpServer.Test
                 Url = "/Test/Example"
             }, new Route()
             {
-                Url = "^/Test/Example$",
+                UrlRegex = "^/Test/Example$",
                 Method = "GET",
                 Callable = (HttpRequest request) =>
                 {
                     return new HttpResponse()
                     {
-                        Content = "Hello World",
+                        ContentAsUTF8 = "Hello World",
                         ReasonPhrase = "OK",
                         StatusCode = "200"
                     };
@@ -176,7 +176,7 @@ namespace SimpleHttpServer.Test
                 Content = "Hello World"
             }, new Route()
             {
-                Url = "^/Test/Example$",
+                UrlRegex = "^/Test/Example$",
                 Method = "POST",
                 Callable = (HttpRequest request) =>
                 {
@@ -184,7 +184,7 @@ namespace SimpleHttpServer.Test
 
                     return new HttpResponse()
                     {
-                        Content = "Hello World",
+                        ContentAsUTF8 = "Hello World",
                         ReasonPhrase = "OK",
                         StatusCode = "200"
                     };
