@@ -1,5 +1,6 @@
 ﻿// Copyright (C) 2016 by David Jeske, Barend Erasmus and donated to the public domain
 
+using log4net;
 using SimpleHttpServer.Models;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace SimpleHttpServer
         private static int MAX_POST_SIZE = 10 * 1024 * 1024; // 10MB
 
         private List<Route> Routes = new List<Route>();
+
+        private static readonly ILog log = LogManager.GetLogger(typeof(HttpProcessor));
 
         #endregion
 
@@ -126,11 +129,7 @@ namespace SimpleHttpServer
             List<Route> routes = this.Routes.Where(x => Regex.Match(request.Url, x.UrlRegex).Success).ToList();
 
             if (!routes.Any())
-                return new HttpResponse()
-                {
-                    ReasonPhrase = "Not Found (no handler)",
-                    StatusCode = "404",
-                };
+                return HttpBuilder.NotFound();
 
             Route route = routes.SingleOrDefault(x => x.Method == request.Method);
 
@@ -155,13 +154,8 @@ namespace SimpleHttpServer
             try {
                 return route.Callable(request);
             } catch(Exception ex) {
-                Console.WriteLine("Route Handler Exception ({0}): {1}",route.Name,ex.ToString());
-
-                return new HttpResponse()
-                {
-                    ReasonPhrase = string.Format("Internal Server Error ({0})", route.Name),
-                    StatusCode = "500",
-                };
+                log.Error(ex);
+                return HttpBuilder.InternalServerError();
             }
 
         }
