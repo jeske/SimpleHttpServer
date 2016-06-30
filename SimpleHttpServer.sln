@@ -10,8 +10,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer.Test", "SimpleHttpServer.Test\SimpleHttpServer.Test.csproj", "{A04B89BA-8FB7-44F1-8343-BB51ED1017A0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer.App", "SimpleHttpServer.App\SimpleHttpServer.App.csproj", "{61CCC111-4C28-4768-90D3-9A5D27A480CF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A04B89BA-8FB7-44F1-8343-BB51ED1017A0} = {A04B89BA-8FB7-44F1-8343-BB51ED1017A0}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer.WebApp", "SimpleHttpServer.WebApp\SimpleHttpServer.WebApp.csproj", "{52C884A2-B53B-4893-9F4F-F91F096D00B0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A04B89BA-8FB7-44F1-8343-BB51ED1017A0} = {A04B89BA-8FB7-44F1-8343-BB51ED1017A0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
