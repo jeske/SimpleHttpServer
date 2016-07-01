@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="ConfigurationDefaults.cs" />
     <Compile Include="ExceptionHandler.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="HttpBuilder.cs" />
     <Compile Include="HttpProcessor.cs" />
     <Compile Include="Models\HttpRequest.cs" />

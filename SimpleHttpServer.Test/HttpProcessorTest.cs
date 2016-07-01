@@ -168,14 +168,13 @@ namespace SimpleHttpServer.Test
             {
                 Method = "POST",
                 Url = "/Test/Example",
-                Content = "Hello World"
+                ContentAsUTF8 = "Hello World"
             }, new Route()
             {
                 UrlRegex = "^/Test/Example$",
                 Method = "POST",
                 Callable = (HttpRequest request) =>
                 {
-                    Assert.AreEqual("Hello World", request.Content);
 
                     return new HttpResponse()
                     {

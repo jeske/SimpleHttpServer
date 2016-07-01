@@ -71,24 +71,29 @@ namespace SimpleHttpServer
         // this formats the HTTP response...
         private static void WriteResponse(Stream stream, HttpResponse response)
         {
-            if (response.Content == null)
-            {
-                response.Content = new byte[] { };
-            }
-
             // default to text/html content type
             if (!response.Headers.ContainsKey("Content-Type"))
             {
                 response.Headers["Content-Type"] = "text/html";
             }
 
-            response.Headers["Content-Length"] = response.Content.Length.ToString();
+            response.Headers["Content-Length"] = response.ContentStream.Length.ToString();
 
-            Write(stream, string.Format("HTTP/1.0 {0} {1}\r\n", (int)response.HttpStatusCode, response.HttpStatusCode.ToString()));
-            Write(stream, string.Join("\r\n", response.Headers.Select(x => string.Format("{0}: {1}", x.Key, x.Value))));
-            Write(stream, "\r\n\r\n");
+            Write(stream, response.ToHeader());
 
-            stream.Write(response.Content, 0, response.Content.Length);
+            long totalBytes = response.ContentStream.Length;
+            long bytesLeft = totalBytes;
+
+            while (bytesLeft > 0)
+            {
+                byte[] buffer = new byte[bytesLeft > ConfigurationDefaults.BufferSize ? ConfigurationDefaults.BufferSize : bytesLeft];
+                int n = response.ContentStream.Read(buffer, 0, buffer.Length);
+
+                stream.Write(buffer, 0, n);
+
+                bytesLeft -= n;
+            }
+
         }
 
         public void AddRoute(Route route)
@@ -205,23 +210,23 @@ namespace SimpleHttpServer
                 headers.Add(name, value);
             }
 
-            string content = null;
+            Stream contentStream = new MemoryStream();
+
             if (headers.ContainsKey("Content-Length"))
             {
-                int totalBytes = Convert.ToInt32(headers["Content-Length"]);
-                int bytesLeft = totalBytes;
-                byte[] bytes = new byte[totalBytes];
+                long totalBytes = Convert.ToInt32(headers["Content-Length"]);
+                long bytesLeft = totalBytes;
 
                 while (bytesLeft > 0)
                 {
-                    byte[] buffer = new byte[bytesLeft > 1024 ? 1024 : bytesLeft];
+                    byte[] buffer = new byte[bytesLeft > ConfigurationDefaults.BufferSize ? ConfigurationDefaults.BufferSize : bytesLeft];
                     int n = inputStream.Read(buffer, 0, buffer.Length);
-                    buffer.CopyTo(bytes, totalBytes - bytesLeft);
+
+                    contentStream.Write(buffer, 0, n);
 
                     bytesLeft -= n;
                 }
 
-                content = Encoding.ASCII.GetString(bytes);
             }
 
 
@@ -230,7 +235,7 @@ namespace SimpleHttpServer
                 Method = method,
                 Url = url,
                 Headers = headers,
-                Content = content
+                ContentStream = contentStream
             };
         }
 

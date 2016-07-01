@@ -1,7 +1,9 @@
 ﻿// Copyright (C) 2016 by Barend Erasmus and donated to the public domain
 
+using SimpleHttpServer.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,11 +20,19 @@ namespace SimpleHttpServer.Models
 
         public string Method { get; set; }
         public string Url { get; set; }
-        public string Content { get; set; }
+        public Stream ContentStream { get; set; }
         public Route Route { get; set; }
         public Dictionary<string, string> Headers { get; set; }
 
         #endregion
+
+        public string ContentAsUTF8
+        {
+            set
+            {
+                ContentStream = value.ToStream();
+            }
+        }
 
         #region Constructors
         public HttpRequest()
@@ -35,11 +45,15 @@ namespace SimpleHttpServer.Models
         #region Public Methods
         public override string ToString()
         {
-            if (!string.IsNullOrWhiteSpace(this.Content))
-                if (!this.Headers.ContainsKey("Content-Length"))
-                    this.Headers.Add("Content-Length", this.Content.Length.ToString());
+            return string.Format("{0} - {1}", this.Method, this.Url);
+        }
 
-            return string.Format("{0} {1} HTTP/1.0\r\n{2}\r\n\r\n{3}", this.Method, this.Url, string.Join("\r\n", this.Headers.Select(x => string.Format("{0}: {1}", x.Key, x.Value))), this.Content);
+        public string ToHeader()
+        {
+            if (!this.Headers.ContainsKey("Content-Length"))
+                this.Headers.Add("Content-Length", this.ContentStream.Length.ToString());
+
+            return string.Format("{0} {1} HTTP/1.0\r\n{2}\r\n\r\n", this.Method, this.Url, string.Join("\r\n", this.Headers.Select(x => string.Format("{0}: {1}", x.Key, x.Value))));
         }
 
         public string GetPath()
@@ -51,6 +65,12 @@ namespace SimpleHttpServer.Models
                 return Url;
 
         }
+
+        #endregion
+
+        #region Private Methods
+
+
         #endregion
     }
 }

@@ -67,7 +67,7 @@ namespace SimpleHttpServer.RouteHandlers
             var response = new HttpResponse();
             response.HttpStatusCode = HttpStatusCode.Ok;
             response.Headers["Content-Type"] = QuickMimeTypeMapper.GetMimeType(file_extension);
-            response.Content = File.ReadAllBytes(local_path);
+            response.ContentStream = File.Open(local_path, FileMode.Open);
 
             return response;
         }

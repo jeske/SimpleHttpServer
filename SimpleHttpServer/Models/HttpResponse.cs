@@ -1,7 +1,9 @@
 ﻿// Copyright (C) 2016 by Barend Erasmus and donated to the public domain
 
+using SimpleHttpServer.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -42,7 +44,7 @@ namespace SimpleHttpServer.Models
         #region Properties
 
         public HttpStatusCode HttpStatusCode { get; set; }
-        public byte[] Content { get; set; }
+        public Stream ContentStream { get; set; }
         public Dictionary<string, string> Headers { get; set; }
 
         #endregion
@@ -51,7 +53,7 @@ namespace SimpleHttpServer.Models
         {
             set
             {
-                this.SetContent(value, encoding: Encoding.UTF8);
+                ContentStream = value.ToStream();
             }
         }
 
@@ -66,31 +68,29 @@ namespace SimpleHttpServer.Models
 
         #region Public Methods
 
-        // informational only tostring...
         public override string ToString()
         {
-            return string.Format("HTTP status {0} {1}", (int)this.HttpStatusCode, this.HttpStatusCode.ToString());
+            return string.Format("{0} {1}", (int)HttpStatusCode, HttpStatusCode.ToString());
+        }
+
+        public string ToHeader()
+        {
+            StringBuilder strBuilder = new StringBuilder();
+
+            strBuilder.Append(string.Format("HTTP/1.0 {0} {1}\r\n", (int)HttpStatusCode, HttpStatusCode.ToString()));
+            strBuilder.Append(string.Join("\r\n", Headers.Select(x => string.Format("{0}: {1}", x.Key, x.Value))));
+            strBuilder.Append("\r\n\r\n");
+
+            return strBuilder.ToString();
+
         }
 
         public bool IsValid()
         {
-            if (Content == null)
+            if (ContentStream == null)
                 return false;
 
             return true;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void SetContent(string content, Encoding encoding = null)
-        {
-            if (encoding == null)
-            {
-                encoding = Encoding.UTF8;
-            }
-            Content = encoding.GetBytes(content);
         }
 
         #endregion
