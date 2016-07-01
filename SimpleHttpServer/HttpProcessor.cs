@@ -41,9 +41,7 @@ namespace SimpleHttpServer
         {
             try
             {
-                Guid connectionId = Guid.NewGuid();
-
-                log.Info(string.Format("{0} has connected [{1}]", ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString(), connectionId));
+                log.Info(string.Format("{0} has connected", ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()));
 
 
                 Stream inputStream = GetInputStream(tcpClient);
@@ -56,12 +54,11 @@ namespace SimpleHttpServer
                        
                         HttpRequest request = GetRequest(inputStream, outputStream);
 
-                        // route and handle the request...
                         HttpResponse response = RouteRequest(inputStream, outputStream, request);
 
                         WriteResponse(outputStream, response);
 
-                        log.Info(string.Format("{0} -> {1} [{2}]", request.Url, response.HttpStatusCode, connectionId));
+                        log.Info(string.Format("{0} -> {1}", request.Url, response.HttpStatusCode));
                     }
                 }
 
@@ -75,8 +72,6 @@ namespace SimpleHttpServer
 
                 tcpClient.Close();
 
-                log.Info(string.Format("[{0}] has been closed", connectionId));
-
             }
             catch(Exception ex)
             {
@@ -85,18 +80,40 @@ namespace SimpleHttpServer
 
         }
 
-        // this formats the HTTP response...
-        private static void WriteResponse(Stream stream, HttpResponse response)
+        public void AddRoute(Route route)
         {
-            // default to text/html content type
-            if (!response.Headers.ContainsKey("Content-Type"))
+            this.Routes.Add(route);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private string Readline(Stream stream)
+        {
+            int next_char;
+            string data = "";
+            while (true)
             {
-                response.Headers["Content-Type"] = "text/html";
+                next_char = stream.ReadByte();
+                if (next_char == '\n') { break; }
+                if (next_char == '\r') { continue; }
+                if (next_char == -1) { Thread.Sleep(1); continue; };
+                data += Convert.ToChar(next_char);
             }
+            return data;
+        }
+
+        private void WriteResponse(Stream stream, HttpResponse response)
+        {
+
+            if (!response.Headers.ContainsKey("Content-Type"))
+                response.Headers["Content-Type"] = "text/html";
+
 
             response.Headers["Content-Length"] = response.ContentStream.Length.ToString();
 
-            Write(stream, response.ToHeader());
+            WriteLineToStream(stream, response.ToHeader());
 
             long totalBytes = response.ContentStream.Length;
             long bytesLeft = totalBytes;
@@ -113,31 +130,7 @@ namespace SimpleHttpServer
 
         }
 
-        public void AddRoute(Route route)
-        {
-            this.Routes.Add(route);
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static string Readline(Stream stream)
-        {
-            int next_char;
-            string data = "";
-            while (true)
-            {
-                next_char = stream.ReadByte();
-                if (next_char == '\n') { break; }
-                if (next_char == '\r') { continue; }
-                if (next_char == -1) { Thread.Sleep(1); continue; };
-                data += Convert.ToChar(next_char);
-            }
-            return data;
-        }
-
-        private static void Write(Stream stream, string text)
+        private void WriteLineToStream(Stream stream, string text)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
             stream.Write(bytes, 0, bytes.Length);
@@ -166,7 +159,6 @@ namespace SimpleHttpServer
             if (route == null)
                 return HttpBuilder.MethodNotAllowed();
 
-            // trigger the route handler...
             request.Route = route;
             try
             {

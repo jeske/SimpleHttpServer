@@ -7,13 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-// NOTE: two consequences of this simplified response model are:
-//
-//      (a) it's not possible to send 8-bit clean responses (like file content)
-//      (b) it's 
-//       must be loaded into memory in the the Content property. If you want to send large files,
-//       this has to be reworked so a handler can write to the output stream instead. 
-
 namespace SimpleHttpServer.Models
 {
     public enum HttpStatusCode
@@ -49,14 +42,7 @@ namespace SimpleHttpServer.Models
 
         #endregion
 
-        public string ContentAsUTF8
-        {
-            set
-            {
-                ContentStream = value.ToStream();
-            }
-        }
-
+      
         #region Constructors
 
         public HttpResponse()
@@ -73,6 +59,14 @@ namespace SimpleHttpServer.Models
         public override string ToString()
         {
             return string.Format("{0} {1}", (int)HttpStatusCode, HttpStatusCode.ToString());
+        }
+
+        public string ContentAsUTF8
+        {
+            set
+            {
+                ContentStream = value.ToStream();
+            }
         }
 
         public string ToHeader()

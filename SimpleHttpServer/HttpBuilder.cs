@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace SimpleHttpServer
 {
+
+    public enum HttpHeader
+    {
+        Location
+    }
+
     public class HttpBuilder
     {
         #region Public Methods
@@ -34,7 +40,7 @@ namespace SimpleHttpServer
             string content = File.ReadAllText("Resources/Pages/404.html");
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
-            headers.Add("Location", url);
+            headers.Add(HttpHeader.Location.ToString(), url);
 
             return new HttpResponse()
             {
