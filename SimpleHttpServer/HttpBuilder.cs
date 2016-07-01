@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SimpleHttpServer
 {
-    class HttpBuilder
+    public class HttpBuilder
     {
         #region Public Methods
 
@@ -26,6 +26,21 @@ namespace SimpleHttpServer
             {
                 HttpStatusCode = HttpStatusCode.InternalServerError,
                 ContentAsUTF8 = content
+            };
+        }
+
+        public static HttpResponse MovedPermanently(string url)
+        {
+            string content = File.ReadAllText("Resources/Pages/404.html");
+
+            Dictionary<string, string> headers = new Dictionary<string, string>();
+            headers.Add("Location", url);
+
+            return new HttpResponse()
+            {
+                HttpStatusCode = HttpStatusCode.MovedPermanently,
+                ContentAsUTF8 = string.Empty,
+                Headers = headers
             };
         }
 

@@ -229,6 +229,9 @@ namespace SimpleHttpServer
 
             }
 
+            contentStream.Flush();
+            contentStream.Close();
+
 
             return new HttpRequest()
             {

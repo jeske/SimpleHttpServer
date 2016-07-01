@@ -63,7 +63,6 @@ namespace SimpleHttpServer.Models
                 return match.Groups[1].Value;
             else
                 return Url;
-
         }
 
         #endregion
