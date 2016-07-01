@@ -13,3 +13,5 @@
 /SimpleHttpServer.WebApp/obj/Debug
 /packages/log4net.2.0.5
 /SimpleHttpServer/obj/Debug
+/SimpleHttpServer.ViewEngine/obj/Debug
+/.vs/config

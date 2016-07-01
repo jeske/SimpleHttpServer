@@ -28,7 +28,7 @@ namespace SimpleHttpServer.WebApp
                     },
                     new Route()
                     {
-                        Callable = new FileSystemRouteHandler() { BasePath = @"C:\Users\Barend.Erasmus\Desktop\Test"}.Handle,
+                        Callable = new FileSystemRouteHandler() { BasePath = string.Format(@"{0}\{1}",AppDomain.CurrentDomain.BaseDirectory, "Static")}.Handle,
                         UrlRegex = "^\\/Static\\/(.*)$",
                         Method = "GET"
                     }

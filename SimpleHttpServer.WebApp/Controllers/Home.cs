@@ -1,6 +1,7 @@
 ﻿using SimpleHttpServer.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace SimpleHttpServer.WebApp.Controllers
         {
             return new HttpResponse()
             {
-                ContentAsUTF8 = "Hello",
+                ContentAsUTF8 = File.ReadAllText("Views/Home/Index.html"),
                 HttpStatusCode = HttpStatusCode.Ok
             };
 
