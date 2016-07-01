@@ -18,6 +18,7 @@ namespace SimpleHttpServer.RouteHandlers
 
         public HttpResponse Handle(HttpRequest request)
         {
+
             var url_part = request.GetPath();
 
             //read everything before query params start
@@ -67,7 +68,7 @@ namespace SimpleHttpServer.RouteHandlers
             var response = new HttpResponse();
             response.HttpStatusCode = HttpStatusCode.Ok;
             response.Headers["Content-Type"] = QuickMimeTypeMapper.GetMimeType(file_extension);
-            response.ContentStream = File.Open(local_path, FileMode.Open);
+            response.ContentStream = File.Open(local_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             return response;
         }

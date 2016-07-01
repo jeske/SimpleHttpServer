@@ -8,7 +8,8 @@ namespace SimpleHttpServer
 {
     static class ConfigurationDefaults
     {
-        public const bool ThrowExceptions = false;
+        public const bool ThrowExceptions = true;
         public const int BufferSize = 1024;
+        public const string HttpVersion = "1.0";
     }
 }

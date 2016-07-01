@@ -160,12 +160,12 @@ namespace SimpleHttpServer
                     return result;
                 }
 
-                return HttpBuilder.InternalServerError();
+                return HttpBuilder.InternalServerError(new Exception("Response is not valid"));
             }
             catch (Exception ex)
             {
                 log.Error(ex);
-                return HttpBuilder.InternalServerError();
+                return HttpBuilder.InternalServerError(ex);
             }
 
         }

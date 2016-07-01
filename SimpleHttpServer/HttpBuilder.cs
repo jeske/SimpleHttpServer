@@ -12,9 +12,15 @@ namespace SimpleHttpServer
     {
         #region Public Methods
 
-        public static HttpResponse InternalServerError()
+        public static HttpResponse InternalServerError(Exception ex)
         {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("message", ex.Message);
+
             string content = File.ReadAllText("Resources/Pages/500.html");
+
+            ViewEngine.SimpleViewEngine viewEngine = new ViewEngine.SimpleViewEngine();
+            content = viewEngine.Render(content, data);
 
             return new HttpResponse()
             {

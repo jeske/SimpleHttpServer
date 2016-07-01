@@ -77,8 +77,8 @@ namespace SimpleHttpServer.Models
         {
             StringBuilder strBuilder = new StringBuilder();
 
-            strBuilder.Append(string.Format("HTTP/1.0 {0} {1}\r\n", (int)HttpStatusCode, HttpStatusCode.ToString()));
-            strBuilder.Append(string.Join("\r\n", Headers.Select(x => string.Format("{0}: {1}", x.Key, x.Value))));
+            strBuilder.Append(string.Format("HTTP/{0} {1} {2}\r\n", ConfigurationDefaults.HttpVersion, (int)HttpStatusCode, HttpStatusCode.ToString()));
+            strBuilder.Append(Headers.ToHttpHeaders());
             strBuilder.Append("\r\n\r\n");
 
             return strBuilder.ToString();

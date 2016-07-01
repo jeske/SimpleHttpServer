@@ -19,5 +19,11 @@ namespace SimpleHttpServer.WebApp.Controllers
             };
 
         }
+
+        public HttpResponse Error(HttpRequest request)
+        {
+            throw new Exception("Can't call this action.");
+
+        }
     }
 }

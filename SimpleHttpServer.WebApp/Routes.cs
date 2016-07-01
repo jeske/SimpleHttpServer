@@ -26,6 +26,12 @@ namespace SimpleHttpServer.WebApp
                         UrlRegex = "^\\/$",
                         Method = "GET"
                     },
+                     new Route()
+                    {
+                        Callable = new Home().Error,
+                        UrlRegex = "^\\/Error$",
+                        Method = "GET"
+                    },
                     new Route()
                     {
                         Callable = new FileSystemRouteHandler() {
