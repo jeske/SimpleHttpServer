@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -37,21 +38,33 @@ namespace SimpleHttpServer
         #region Public Methods
         public void HandleClient(TcpClient tcpClient)
         {
-            Stream inputStream = GetInputStream(tcpClient);
-            Stream outputStream = GetOutputStream(tcpClient);
-            HttpRequest request = GetRequest(inputStream, outputStream);
+            try
+            {
+                log.Info(string.Format("{0} has connected", ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()));
 
-            // route and handle the request...
-            HttpResponse response = RouteRequest(inputStream, outputStream, request);
+                Stream inputStream = GetInputStream(tcpClient);
+                Stream outputStream = GetOutputStream(tcpClient);
 
-            WriteResponse(outputStream, response);
+                HttpRequest request = GetRequest(inputStream, outputStream);
 
-            outputStream.Flush();
-            outputStream.Close();
-            outputStream = null;
+                // route and handle the request...
+                HttpResponse response = RouteRequest(inputStream, outputStream, request);
 
-            inputStream.Close();
-            inputStream = null;
+                WriteResponse(outputStream, response);
+
+                outputStream.Flush();
+                outputStream.Close();
+                outputStream = null;
+
+                inputStream.Close();
+                inputStream = null;
+
+                log.Info(string.Format("{0} -> {1}", request.Url, response.HttpStatusCode));
+
+            }catch(Exception ex)
+            {
+                ExceptionHandler.Handle(log, ex);
+            }
 
         }
 

@@ -2,6 +2,7 @@
 
 using SimpleHttpServer.Models;
 using SimpleHttpServer.RouteHandlers;
+using SimpleHttpServer.WebApp.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace SimpleHttpServer.WebApp
                 {
                     new Route()
                     {
-                        Callable = HomeIndex,
+                        Callable = new Home().Index,
                         UrlRegex = "^\\/$",
                         Method = "GET"
                     },
@@ -34,16 +35,6 @@ namespace SimpleHttpServer.WebApp
                 };
 
             }
-        }
-
-        private static HttpResponse HomeIndex(HttpRequest request)
-        {
-            return new HttpResponse()
-            {
-                ContentAsUTF8 = "Hello",
-                HttpStatusCode = HttpStatusCode.Ok
-            };
-
         }
     }
 }
