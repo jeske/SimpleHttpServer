@@ -1,11 +1,13 @@
 ﻿// Copyright (C) 2016 by David Jeske, Barend Erasmus and donated to the public domain
 
 using log4net;
+using SimpleHttpServer.Extensions;
 using SimpleHttpServer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -37,22 +39,29 @@ namespace SimpleHttpServer
         #region Public Methods
         public void HandleClient(TcpClient tcpClient)
         {
+            try
+            {
+                log.Info(string.Format("{0} has connected", ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()));
+
+
                 Stream inputStream = GetInputStream(tcpClient);
                 Stream outputStream = GetOutputStream(tcpClient);
-                HttpRequest request = GetRequest(inputStream, outputStream);
 
-                // route and handle the request...
-                HttpResponse response = RouteRequest(inputStream, outputStream, request);      
-          
-                Console.WriteLine("{0} {1}",response.StatusCode,request.Url);
-                // build a default response for errors
-                if (response.Content == null) {
-                    if (response.StatusCode != "200") {
-                        response.ContentAsUTF8 = string.Format("{0} {1} <p> {2}", response.StatusCode, request.Url, response.ReasonPhrase);
+                while (tcpClient.IsConnected())
+                {
+                    if (tcpClient.Available > 0)
+                    {
+                       
+                        HttpRequest request = GetRequest(inputStream, outputStream);
+
+                        HttpResponse response = RouteRequest(inputStream, outputStream, request);
+
+                        WriteResponse(outputStream, response);
+
+                        log.Info(string.Format("{0} -> {1}", request.Url, response.HttpStatusCode));
                     }
                 }
 
-                WriteResponse(outputStream, response);
 
                 outputStream.Flush();
                 outputStream.Close();
@@ -61,26 +70,14 @@ namespace SimpleHttpServer
                 inputStream.Close();
                 inputStream = null;
 
-        }
+                tcpClient.Close();
 
-        // this formats the HTTP response...
-        private static void WriteResponse(Stream stream, HttpResponse response) {            
-            if (response.Content == null) {           
-                response.Content = new byte[]{};
             }
-            
-            // default to text/html content type
-            if (!response.Headers.ContainsKey("Content-Type")) {
-                response.Headers["Content-Type"] = "text/html";
+            catch(Exception ex)
+            {
+                ExceptionHandler.Handle(log, ex);
             }
 
-            response.Headers["Content-Length"] = response.Content.Length.ToString();
-
-            Write(stream, string.Format("HTTP/1.0 {0} {1}\r\n",response.StatusCode,response.ReasonPhrase));
-            Write(stream, string.Join("\r\n", response.Headers.Select(x => string.Format("{0}: {1}", x.Key, x.Value))));
-            Write(stream, "\r\n\r\n");
-
-            stream.Write(response.Content, 0, response.Content.Length);       
         }
 
         public void AddRoute(Route route)
@@ -92,7 +89,7 @@ namespace SimpleHttpServer
 
         #region Private Methods
 
-        private static string Readline(Stream stream)
+        private string Readline(Stream stream)
         {
             int next_char;
             string data = "";
@@ -107,7 +104,33 @@ namespace SimpleHttpServer
             return data;
         }
 
-        private static void Write(Stream stream, string text)
+        private void WriteResponse(Stream stream, HttpResponse response)
+        {
+
+            if (!response.Headers.ContainsKey("Content-Type"))
+                response.Headers["Content-Type"] = "text/html";
+
+
+            response.Headers["Content-Length"] = response.ContentStream.Length.ToString();
+
+            WriteLineToStream(stream, response.ToHeader());
+
+            long totalBytes = response.ContentStream.Length;
+            long bytesLeft = totalBytes;
+
+            while (bytesLeft > 0)
+            {
+                byte[] buffer = new byte[bytesLeft > ConfigurationDefaults.BufferSize ? ConfigurationDefaults.BufferSize : bytesLeft];
+                int n = response.ContentStream.Read(buffer, 0, buffer.Length);
+
+                stream.Write(buffer, 0, n);
+
+                bytesLeft -= n;
+            }
+
+        }
+
+        private void WriteLineToStream(Stream stream, string text)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
             stream.Write(bytes, 0, bytes.Length);
@@ -134,28 +157,24 @@ namespace SimpleHttpServer
             Route route = routes.SingleOrDefault(x => x.Method == request.Method);
 
             if (route == null)
-                return new HttpResponse()
-                {
-                    ReasonPhrase = "Method Not Allowed",
-                    StatusCode = "405",
+                return HttpBuilder.MethodNotAllowed();
 
-                };
-
-            // extract the path if there is one
-            var match = Regex.Match(request.Url,route.UrlRegex);
-            if (match.Groups.Count > 1) {
-                request.Path = match.Groups[1].Value;
-            } else {
-                request.Path = request.Url;
-            }
-
-            // trigger the route handler...
             request.Route = route;
-            try {
-                return route.Callable(request);
-            } catch(Exception ex) {
+            try
+            {
+                var result = route.Callable(request);
+
+                if (result.IsValid())
+                {
+                    return result;
+                }
+
+                return HttpBuilder.InternalServerError(new Exception("Response is not valid"));
+            }
+            catch (Exception ex)
+            {
                 log.Error(ex);
-                return HttpBuilder.InternalServerError();
+                return HttpBuilder.InternalServerError(ex);
             }
 
         }
@@ -200,24 +219,27 @@ namespace SimpleHttpServer
                 headers.Add(name, value);
             }
 
-            string content = null;
+            Stream contentStream = new MemoryStream();
+
             if (headers.ContainsKey("Content-Length"))
             {
-                int totalBytes = Convert.ToInt32(headers["Content-Length"]);
-                int bytesLeft = totalBytes;
-                byte[] bytes = new byte[totalBytes];
-               
-                while(bytesLeft > 0)
+                long totalBytes = Convert.ToInt32(headers["Content-Length"]);
+                long bytesLeft = totalBytes;
+
+                while (bytesLeft > 0)
                 {
-                    byte[] buffer = new byte[bytesLeft > 1024? 1024 : bytesLeft];
+                    byte[] buffer = new byte[bytesLeft > ConfigurationDefaults.BufferSize ? ConfigurationDefaults.BufferSize : bytesLeft];
                     int n = inputStream.Read(buffer, 0, buffer.Length);
-                    buffer.CopyTo(bytes, totalBytes - bytesLeft);
+
+                    contentStream.Write(buffer, 0, n);
 
                     bytesLeft -= n;
                 }
 
-                content = Encoding.ASCII.GetString(bytes);
             }
+
+            contentStream.Flush();
+            contentStream.Close();
 
 
             return new HttpRequest()
@@ -225,7 +247,7 @@ namespace SimpleHttpServer
                 Method = method,
                 Url = url,
                 Headers = headers,
-                Content = content
+                ContentStream = contentStream
             };
         }
 

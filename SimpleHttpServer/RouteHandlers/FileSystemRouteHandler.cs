@@ -16,67 +16,79 @@ namespace SimpleHttpServer.RouteHandlers
         public string BasePath { get; set; }
         public bool ShowDirectories { get; set; }
 
-        public HttpResponse Handle(HttpRequest request) {
-            var url_part = request.Path;
+        public HttpResponse Handle(HttpRequest request)
+        {
+
+            var url_part = request.GetPath();
+
+            //read everything before query params start
+            if (url_part.Contains("?"))
+                url_part = url_part.Substring(0, url_part.IndexOf("?"));
 
             // do some basic sanitization of the URL, attempting to make sure they can't read files outside the basepath
             // NOTE: this is probably not bulletproof/secure
             url_part = url_part.Replace("\\..\\", "\\");
             url_part = url_part.Replace("/../", "/");
-            url_part = url_part.Replace("//","/");
-            url_part = url_part.Replace(@"\\",@"\");
-            url_part = url_part.Replace(":","");           
-            url_part = url_part.Replace("/",Path.DirectorySeparatorChar.ToString());
-           
+            url_part = url_part.Replace("//", "/");
+            url_part = url_part.Replace(@"\\", @"\");
+            url_part = url_part.Replace(":", "");
+            url_part = url_part.Replace("/", Path.DirectorySeparatorChar.ToString());
+
             // make sure the first part of the path is not 
-            if (url_part.Length > 0) {
+            if (url_part.Length > 0)
+            {
                 var first_char = url_part.ElementAt(0);
-                if (first_char == '/' || first_char == '\\') {
+                if (first_char == '/' || first_char == '\\')
+                {
                     url_part = "." + url_part;
                 }
             }
             var local_path = Path.Combine(this.BasePath, url_part);
-                
-            if (ShowDirectories && Directory.Exists(local_path)) {
+
+            if (ShowDirectories && Directory.Exists(local_path))
+            {
                 // Console.WriteLine("FileSystemRouteHandler Dir {0}",local_path);
                 return Handle_LocalDir(request, local_path);
-            } else if (File.Exists(local_path)) {
+            }
+            else if (File.Exists(local_path))
+            {
                 // Console.WriteLine("FileSystemRouteHandler File {0}", local_path);
                 return Handle_LocalFile(request, local_path);
-            } else {
-                return new HttpResponse {
-                    StatusCode = "404",
-                    ReasonPhrase = string.Format("Not Found ({0}) handler({1})",local_path,request.Route.Name),
-                };
+            }
+            else
+            {
+                return HttpBuilder.NotFound();
             }
         }
 
-        HttpResponse Handle_LocalFile(HttpRequest request, string local_path) {        
+        HttpResponse Handle_LocalFile(HttpRequest request, string local_path)
+        {
             var file_extension = Path.GetExtension(local_path);
 
             var response = new HttpResponse();
-            response.StatusCode = "200";
-            response.ReasonPhrase = "Ok";
+            response.HttpStatusCode = HttpStatusCode.Ok;
             response.Headers["Content-Type"] = QuickMimeTypeMapper.GetMimeType(file_extension);
-            response.Content = File.ReadAllBytes(local_path);
+            response.ContentStream = File.Open(local_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             return response;
         }
 
-        HttpResponse Handle_LocalDir(HttpRequest request, string local_path) {
+        HttpResponse Handle_LocalDir(HttpRequest request, string local_path)
+        {
             var output = new StringBuilder();
-            output.Append(string.Format("<h1> Directory: {0} </h1>",request.Url));
-                        
-            foreach (var entry in Directory.GetFiles(local_path)) {                
+            output.Append(string.Format("<h1> Directory: {0} </h1>", request.Url));
+
+            foreach (var entry in Directory.GetFiles(local_path))
+            {
                 var file_info = new System.IO.FileInfo(entry);
 
                 var filename = file_info.Name;
-                output.Append(string.Format("<a href=\"{1}\">{1}</a> <br>",filename,filename));                
-            }            
+                output.Append(string.Format("<a href=\"{0}/{1}\">{1}</a> <br>", request.Url, filename));
+            }
 
-            return new HttpResponse() {
-                StatusCode = "200",
-                ReasonPhrase = "Ok",
+            return new HttpResponse()
+            {
+                HttpStatusCode = HttpStatusCode.Ok,
                 ContentAsUTF8 = output.ToString(),
             };
         }
@@ -90,12 +102,15 @@ namespace SimpleHttpServer.RouteHandlers
     public class QuickMimeTypeMapper
     {
 
-        public static string GetMimeType(string extension) {
-            if (extension == null) {
+        public static string GetMimeType(string extension)
+        {
+            if (extension == null)
+            {
                 throw new ArgumentNullException("extension");
             }
 
-            if (!extension.StartsWith(".")) {
+            if (!extension.StartsWith("."))
+            {
                 extension = "." + extension;
             }
 

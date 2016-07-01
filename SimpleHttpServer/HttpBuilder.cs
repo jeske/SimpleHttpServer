@@ -8,17 +8,45 @@ using System.Threading.Tasks;
 
 namespace SimpleHttpServer
 {
-    class HttpBuilder
+
+    public enum HttpHeader
     {
-        public static HttpResponse InternalServerError()
+        Location
+    }
+
+    public class HttpBuilder
+    {
+        #region Public Methods
+
+        public static HttpResponse InternalServerError(Exception ex)
         {
-            string content = File.ReadAllText("Resources/Pages/500.html"); 
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("message", ex.Message);
+
+            string content = File.ReadAllText("Resources/Pages/500.html");
+
+            ViewEngine.SimpleViewEngine viewEngine = new ViewEngine.SimpleViewEngine();
+            content = viewEngine.Render(content, data);
 
             return new HttpResponse()
             {
-                ReasonPhrase = "InternalServerError",
-                StatusCode = "500",
+                HttpStatusCode = HttpStatusCode.InternalServerError,
                 ContentAsUTF8 = content
+            };
+        }
+
+        public static HttpResponse MovedPermanently(string url)
+        {
+            string content = File.ReadAllText("Resources/Pages/404.html");
+
+            Dictionary<string, string> headers = new Dictionary<string, string>();
+            headers.Add(HttpHeader.Location.ToString(), url);
+
+            return new HttpResponse()
+            {
+                HttpStatusCode = HttpStatusCode.MovedPermanently,
+                ContentAsUTF8 = string.Empty,
+                Headers = headers
             };
         }
 
@@ -28,10 +56,24 @@ namespace SimpleHttpServer
 
             return new HttpResponse()
             {
-                ReasonPhrase = "NotFound",
-                StatusCode = "404",
+                HttpStatusCode = HttpStatusCode.NotFound,
                 ContentAsUTF8 = content
             };
         }
+
+        public static HttpResponse MethodNotAllowed()
+        {
+            string content = File.ReadAllText("Resources/Pages/405.html");
+
+            return new HttpResponse()
+            {
+                HttpStatusCode = HttpStatusCode.MethodNotAllowed,
+                ContentAsUTF8 = content
+            };
+        }
+
+        
+
+        #endregion
     }
 }

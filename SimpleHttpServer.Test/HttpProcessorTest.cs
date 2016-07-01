@@ -27,14 +27,13 @@ namespace SimpleHttpServer.Test
                     return new HttpResponse()
                     {
                         ContentAsUTF8 = "Hello World",
-                        ReasonPhrase = "OK",
-                        StatusCode = "200"
+                        HttpStatusCode = HttpStatusCode.Ok
                     };
                 }
             });
 
             httpProcessor.HandleClient(null);
-            Assert.AreEqual("200", httpProcessor.Response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Ok, httpProcessor.Response.HttpStatusCode);
         }
 
         [TestMethod]
@@ -55,7 +54,7 @@ namespace SimpleHttpServer.Test
             });
 
             httpProcessor.HandleClient(null);
-            Assert.AreEqual("500", httpProcessor.Response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, httpProcessor.Response.HttpStatusCode);
         }
 
         [TestMethod]
@@ -74,14 +73,13 @@ namespace SimpleHttpServer.Test
                     return new HttpResponse()
                     {
                         ContentAsUTF8 = "Hello World",
-                        ReasonPhrase = "OK",
-                        StatusCode = "200"
+                        HttpStatusCode = HttpStatusCode.Ok
                     };
                 }
             });
 
             httpProcessor.HandleClient(null);
-            Assert.AreEqual("404", httpProcessor.Response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.NotFound, httpProcessor.Response.HttpStatusCode);
         }
 
         [TestMethod]
@@ -100,8 +98,7 @@ namespace SimpleHttpServer.Test
                     return new HttpResponse()
                     {
                         ContentAsUTF8 = "Hello World",
-                        ReasonPhrase = "OK",
-                        StatusCode = "200"
+                        HttpStatusCode = HttpStatusCode.Ok
                     };
                 }
             });
@@ -109,7 +106,7 @@ namespace SimpleHttpServer.Test
             httpProcessor.HandleClient(null);
 
 
-            Assert.AreEqual("200", httpProcessor.Response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Ok, httpProcessor.Response.HttpStatusCode);
         }
 
         [TestMethod]
@@ -128,15 +125,14 @@ namespace SimpleHttpServer.Test
                     return new HttpResponse()
                     {
                         ContentAsUTF8 = "Hello World",
-                        ReasonPhrase = "OK",
-                        StatusCode = "200"
+                        HttpStatusCode = HttpStatusCode.Ok
                     };
                 }
             });
 
             httpProcessor.HandleClient(null);
 
-            Assert.AreEqual("404", httpProcessor.Response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.NotFound, httpProcessor.Response.HttpStatusCode);
         }
 
         [TestMethod]
@@ -155,15 +151,14 @@ namespace SimpleHttpServer.Test
                     return new HttpResponse()
                     {
                         ContentAsUTF8 = "Hello World",
-                        ReasonPhrase = "OK",
-                        StatusCode = "200"
+                        HttpStatusCode = HttpStatusCode.Ok
                     };
                 }
             });
 
             httpProcessor.HandleClient(null);
 
-            Assert.AreEqual("405", httpProcessor.Response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.MethodNotAllowed, httpProcessor.Response.HttpStatusCode);
         }
 
         [TestMethod]
@@ -173,27 +168,25 @@ namespace SimpleHttpServer.Test
             {
                 Method = "POST",
                 Url = "/Test/Example",
-                Content = "Hello World"
+                ContentAsUTF8 = "Hello World"
             }, new Route()
             {
                 UrlRegex = "^/Test/Example$",
                 Method = "POST",
                 Callable = (HttpRequest request) =>
                 {
-                    Assert.AreEqual("Hello World", request.Content);
 
                     return new HttpResponse()
                     {
                         ContentAsUTF8 = "Hello World",
-                        ReasonPhrase = "OK",
-                        StatusCode = "200"
+                        HttpStatusCode = HttpStatusCode.Ok
                     };
                 }
             });
 
             httpProcessor.HandleClient(null);
 
-            Assert.AreEqual("200", httpProcessor.Response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Ok, httpProcessor.Response.HttpStatusCode);
         }
     }
 }

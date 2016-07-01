@@ -2,6 +2,7 @@
 
 using SimpleHttpServer.Models;
 using SimpleHttpServer.RouteHandlers;
+using SimpleHttpServer.WebApp.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,30 +22,40 @@ namespace SimpleHttpServer.WebApp
                 {
                     new Route()
                     {
-                        Callable = HomeIndex,
+                        Callable = new Home().Index,
                         UrlRegex = "^\\/$",
                         Method = "GET"
                     },
                     new Route()
                     {
-                        Callable = new FileSystemRouteHandler() { BasePath = @"C:\Users\Barend.Erasmus\Desktop\Test"}.Handle,
+                        Callable = new Home().Error,
+                        UrlRegex = "^\\/Error$",
+                        Method = "GET"
+                    },
+                    new Route()
+                    {
+                        Callable = new Home().Index,
+                        UrlRegex = "^\\/Demo?.*$",
+                        Method = "GET"
+                    },
+                    new Route()
+                    {
+                        Callable = new Contact().SendEmail,
+                        UrlRegex = "^\\/Contact/SendMail",
+                        Method = "POST"
+                    },
+                    new Route()
+                    {
+                        Callable = new FileSystemRouteHandler() {
+                            BasePath = string.Format(@"{0}\{1}",AppDomain.CurrentDomain.BaseDirectory, "Static"),
+                            ShowDirectories = true
+                        }.Handle,
                         UrlRegex = "^\\/Static\\/(.*)$",
                         Method = "GET"
                     }
                 };
 
             }
-        }
-
-        private static HttpResponse HomeIndex(HttpRequest request)
-        {
-            return new HttpResponse()
-            {
-                ContentAsUTF8 = "Hello",
-                ReasonPhrase = "OK",
-                StatusCode = "200"
-            };
-
         }
     }
 }
