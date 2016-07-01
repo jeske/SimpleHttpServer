@@ -26,14 +26,6 @@ namespace SimpleHttpServer.Models
 
         #endregion
 
-        public string ContentAsUTF8
-        {
-            set
-            {
-                ContentStream = value.ToStream();
-            }
-        }
-
         #region Constructors
         public HttpRequest()
         {
@@ -65,6 +57,30 @@ namespace SimpleHttpServer.Models
                 return Url;
         }
 
+        public Dictionary<string, string> QueryParameters
+        {
+            get
+            {
+                return Url.Substring(Url.IndexOf("?") + 1).Split('&').ToDictionary(x => x.Split('=')[0], x => x.Split('=')[1]);
+            }
+        }
+
+        public Dictionary<string, string> Form
+        {
+            get
+            {
+                string content = ContentStream.GetString();
+                return content.Split('&').ToDictionary(x => x.Split('=')[0], x => x.Split('=')[1]);
+            }
+        }
+
+        public string ContentAsUTF8
+        {
+            set
+            {
+                ContentStream = value.ToStream();
+            }
+        }
         #endregion
 
         #region Private Methods

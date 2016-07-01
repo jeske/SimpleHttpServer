@@ -34,6 +34,12 @@ namespace SimpleHttpServer.WebApp
                     },
                     new Route()
                     {
+                        Callable = new Home().Index,
+                        UrlRegex = "^\\/Demo?.*$",
+                        Method = "GET"
+                    },
+                    new Route()
+                    {
                         Callable = new Contact().SendEmail,
                         UrlRegex = "^\\/Contact/SendMail",
                         Method = "POST"
