@@ -1,6 +1,7 @@
 ﻿// Copyright (C) 2016 by David Jeske, Barend Erasmus and donated to the public domain
 
 using log4net;
+using SimpleHttpServer.Extensions;
 using SimpleHttpServer.Models;
 using System;
 using System.Collections.Generic;
@@ -40,17 +41,30 @@ namespace SimpleHttpServer
         {
             try
             {
-                log.Info(string.Format("{0} has connected", ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()));
+                Guid connectionId = Guid.NewGuid();
+
+                log.Info(string.Format("{0} has connected [{1}]", ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString(), connectionId));
+
 
                 Stream inputStream = GetInputStream(tcpClient);
                 Stream outputStream = GetOutputStream(tcpClient);
 
-                HttpRequest request = GetRequest(inputStream, outputStream);
+                while (tcpClient.IsConnected())
+                {
+                    if (tcpClient.Available > 0)
+                    {
+                       
+                        HttpRequest request = GetRequest(inputStream, outputStream);
 
-                // route and handle the request...
-                HttpResponse response = RouteRequest(inputStream, outputStream, request);
+                        // route and handle the request...
+                        HttpResponse response = RouteRequest(inputStream, outputStream, request);
 
-                WriteResponse(outputStream, response);
+                        WriteResponse(outputStream, response);
+
+                        log.Info(string.Format("{0} -> {1} [{2}]", request.Url, response.HttpStatusCode, connectionId));
+                    }
+                }
+
 
                 outputStream.Flush();
                 outputStream.Close();
@@ -59,9 +73,12 @@ namespace SimpleHttpServer
                 inputStream.Close();
                 inputStream = null;
 
-                log.Info(string.Format("{0} -> {1}", request.Url, response.HttpStatusCode));
+                tcpClient.Close();
 
-            }catch(Exception ex)
+                log.Info(string.Format("[{0}] has been closed", connectionId));
+
+            }
+            catch(Exception ex)
             {
                 ExceptionHandler.Handle(log, ex);
             }

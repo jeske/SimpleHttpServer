@@ -62,6 +62,8 @@ namespace SimpleHttpServer.Models
         public HttpResponse()
         {
             this.Headers = new Dictionary<string, string>();
+
+            Headers.Add("Connection", "Keep-Alive");
         }
 
         #endregion
