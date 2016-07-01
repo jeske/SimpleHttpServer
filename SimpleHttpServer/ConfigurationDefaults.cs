@@ -8,6 +8,6 @@ namespace SimpleHttpServer
 {
     static class ConfigurationDefaults
     {
-        public const bool ThrowExceptions = true;
+        public const bool ThrowExceptions = false;
     }
 }

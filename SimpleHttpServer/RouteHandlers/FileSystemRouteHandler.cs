@@ -82,7 +82,7 @@ namespace SimpleHttpServer.RouteHandlers
                 var file_info = new System.IO.FileInfo(entry);
 
                 var filename = file_info.Name;
-                output.Append(string.Format("<a href=\"{1}\">{1}</a> <br>", filename, filename));
+                output.Append(string.Format("<a href=\"{0}/{1}\">{1}</a> <br>", request.Url, filename));
             }
 
             return new HttpResponse()

@@ -28,7 +28,10 @@ namespace SimpleHttpServer.WebApp
                     },
                     new Route()
                     {
-                        Callable = new FileSystemRouteHandler() { BasePath = string.Format(@"{0}\{1}",AppDomain.CurrentDomain.BaseDirectory, "Static")}.Handle,
+                        Callable = new FileSystemRouteHandler() {
+                            BasePath = string.Format(@"{0}\{1}",AppDomain.CurrentDomain.BaseDirectory, "Static"),
+                            ShowDirectories = true
+                        }.Handle,
                         UrlRegex = "^\\/Static\\/(.*)$",
                         Method = "GET"
                     }
