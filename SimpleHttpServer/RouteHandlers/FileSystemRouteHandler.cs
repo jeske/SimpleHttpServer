@@ -17,7 +17,7 @@ namespace SimpleHttpServer.RouteHandlers
         public bool ShowDirectories { get; set; }
 
         public HttpResponse Handle(HttpRequest request) {
-            var url_part = request.Path;
+            var url_part = request.GetPath();
 
             // do some basic sanitization of the URL, attempting to make sure they can't read files outside the basepath
             // NOTE: this is probably not bulletproof/secure
@@ -44,10 +44,7 @@ namespace SimpleHttpServer.RouteHandlers
                 // Console.WriteLine("FileSystemRouteHandler File {0}", local_path);
                 return Handle_LocalFile(request, local_path);
             } else {
-                return new HttpResponse {
-                    StatusCode = "404",
-                    ReasonPhrase = string.Format("Not Found ({0}) handler({1})",local_path,request.Route.Name),
-                };
+                return HttpBuilder.NotFound();
             }
         }
 
@@ -55,8 +52,7 @@ namespace SimpleHttpServer.RouteHandlers
             var file_extension = Path.GetExtension(local_path);
 
             var response = new HttpResponse();
-            response.StatusCode = "200";
-            response.ReasonPhrase = "Ok";
+            response.HttpStatusCode = HttpStatusCode.Ok;
             response.Headers["Content-Type"] = QuickMimeTypeMapper.GetMimeType(file_extension);
             response.Content = File.ReadAllBytes(local_path);
 
@@ -75,8 +71,7 @@ namespace SimpleHttpServer.RouteHandlers
             }            
 
             return new HttpResponse() {
-                StatusCode = "200",
-                ReasonPhrase = "Ok",
+                HttpStatusCode = HttpStatusCode.Ok,
                 ContentAsUTF8 = output.ToString(),
             };
         }

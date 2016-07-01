@@ -10,14 +10,15 @@ namespace SimpleHttpServer
 {
     class HttpBuilder
     {
+        #region Public Methods
+
         public static HttpResponse InternalServerError()
         {
-            string content = File.ReadAllText("Resources/Pages/500.html"); 
+            string content = File.ReadAllText("Resources/Pages/500.html");
 
             return new HttpResponse()
             {
-                ReasonPhrase = "InternalServerError",
-                StatusCode = "500",
+                HttpStatusCode = HttpStatusCode.InternalServerError,
                 ContentAsUTF8 = content
             };
         }
@@ -28,10 +29,22 @@ namespace SimpleHttpServer
 
             return new HttpResponse()
             {
-                ReasonPhrase = "NotFound",
-                StatusCode = "404",
+                HttpStatusCode = HttpStatusCode.NotFound,
                 ContentAsUTF8 = content
             };
         }
+
+        public static HttpResponse MethodNotAllowed()
+        {
+            string content = File.ReadAllText("Resources/Pages/405.html");
+
+            return new HttpResponse()
+            {
+                HttpStatusCode = HttpStatusCode.MethodNotAllowed,
+                ContentAsUTF8 = content
+            };
+        }
+
+        #endregion
     }
 }
