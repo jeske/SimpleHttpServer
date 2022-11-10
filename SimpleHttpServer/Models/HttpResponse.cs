@@ -39,6 +39,7 @@ namespace SimpleHttpServer.Models
         public string StatusCode { get; set; }
         public string ReasonPhrase { get; set; }
         public byte[] Content { get; set; }
+        public string CharsetName { get; protected set; }
 
         public Dictionary<string, string> Headers { get; set; }
 
@@ -55,6 +56,7 @@ namespace SimpleHttpServer.Models
             {
                 encoding = Encoding.UTF8;
             }
+            CharsetName = encoding.WebName;
             Content = encoding.GetBytes(content);
         }
 
