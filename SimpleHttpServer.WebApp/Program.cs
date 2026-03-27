@@ -13,6 +13,8 @@ namespace SimpleHttpServer.WebApp
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure();
+
             HttpServer httpServer = new HttpServer(8080, Routes.GET);
 
             Thread thread = new Thread(new ThreadStart(httpServer.Listen));

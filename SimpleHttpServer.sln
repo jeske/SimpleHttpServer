@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer", "SimpleHttpServer\SimpleHttpServer.csproj", "{9E139539-C272-488A-BFCF-CADDF458DF9D}"
 EndProject
@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer.WebApp", "
 	ProjectSection(ProjectDependencies) = postProject
 		{A04B89BA-8FB7-44F1-8343-BB51ED1017A0} = {A04B89BA-8FB7-44F1-8343-BB51ED1017A0}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer.ViewEngine", "SimpleHttpServer.ViewEngine\SimpleHttpServer.ViewEngine.csproj", "{7C6A12AE-13A2-4320-975A-8493ED08991A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +42,10 @@ Global
 		{52C884A2-B53B-4893-9F4F-F91F096D00B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52C884A2-B53B-4893-9F4F-F91F096D00B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52C884A2-B53B-4893-9F4F-F91F096D00B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C6A12AE-13A2-4320-975A-8493ED08991A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C6A12AE-13A2-4320-975A-8493ED08991A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C6A12AE-13A2-4320-975A-8493ED08991A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C6A12AE-13A2-4320-975A-8493ED08991A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

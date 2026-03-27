@@ -11,7 +11,7 @@
     <RootNamespace>SimpleHttpServer</RootNamespace>
     <AssemblyName>SimpleHttpServer</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -60,6 +60,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationDefaults.cs" />
+    <Compile Include="ExceptionHandler.cs" />
+    <Compile Include="Extensions\OtherExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="HttpBuilder.cs" />
     <Compile Include="HttpProcessor.cs" />
     <Compile Include="Models\HttpRequest.cs" />
@@ -77,9 +81,18 @@
     <Content Include="Resources\Pages\404.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Pages\405.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Pages\500.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleHttpServer.ViewEngine\SimpleHttpServer.ViewEngine.csproj">
+      <Project>{7c6a12ae-13a2-4320-975a-8493ed08991a}</Project>
+      <Name>SimpleHttpServer.ViewEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

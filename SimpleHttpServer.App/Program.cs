@@ -28,8 +28,7 @@ namespace SimpleHttpServer.App
                         return new HttpResponse()
                         {
                             ContentAsUTF8 = "Hello from SimpleHttpServer",
-                            ReasonPhrase = "OK",
-                            StatusCode = "200"
+                            HttpStatusCode = HttpStatusCode.Ok
                         };
                      }
                 }, 
