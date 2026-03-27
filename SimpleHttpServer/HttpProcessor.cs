@@ -71,7 +71,12 @@ namespace SimpleHttpServer
             
             // default to text/html content type
             if (!response.Headers.ContainsKey("Content-Type")) {
-                response.Headers["Content-Type"] = "text/html";
+                string type = "text/html";
+                if (!string.IsNullOrWhiteSpace(response.CharsetName))
+                {
+                    type += "; charset=" + response.CharsetName;
+                }
+                response.Headers["Content-Type"] = type;
             }
 
             response.Headers["Content-Length"] = response.Content.Length.ToString();
